@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ITradeDataProvider.cs" />
+    <Compile Include="ITradeParser.cs" />
+    <Compile Include="SimpleTradeParser.cs" />
     <Compile Include="StreamTradeDataProvider.cs" />
     <Compile Include="TradeProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
