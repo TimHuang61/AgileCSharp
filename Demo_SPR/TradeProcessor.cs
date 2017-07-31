@@ -18,7 +18,7 @@ namespace Demo_SPR
             StoreTrades(trades);
         }
 
-        private static void ParseTrades(List<TradeRecord> trades)
+        private static void StoreTrades(List<TradeRecord> trades)
         {
             using (var connection = new SqlConnection("Data Source=(local);Initial Catalog=TradeDatabase;Integrated Security=True;"))
             {
