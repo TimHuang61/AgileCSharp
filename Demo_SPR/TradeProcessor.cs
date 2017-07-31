@@ -12,13 +12,43 @@ namespace Demo_SPR
         {
             // read rows
             var tradeData = ReadTradeData(stream);
+            var trades = ParseTrades(tradeData);
 
+            using (var connection = new System.Data.SqlClient.SqlConnection("Data Source=(local);Initial Catalog=TradeDatabase;Integrated Security=True;"))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    foreach (var trade in trades)
+                    {
+                        var command = connection.CreateCommand();
+                        command.Transaction = transaction;
+                        command.CommandType = System.Data.CommandType.StoredProcedure;
+                        command.CommandText = "dbo.insert_trade";
+                        command.Parameters.AddWithValue("@sourceCurrency", trade.SourceCurrency);
+                        command.Parameters.AddWithValue("@destinationCurrency", trade.DestinationCurrency);
+                        command.Parameters.AddWithValue("@lots", trade.Lots);
+                        command.Parameters.AddWithValue("@price", trade.Price);
+
+                        command.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+                connection.Close();
+            }
+
+            Console.WriteLine("INFO: {0} trades processed", trades.Count);
+        }
+
+        private List<TradeRecord> ParseTrades(List<string> tradeData)
+        {
             var trades = new List<TradeRecord>();
 
             var lineCount = 1;
             foreach (var line in tradeData)
             {
-                var fields = line.Split(new char[] { ',' });
+                var fields = line.Split(new char[] {','});
 
                 if (fields.Length != 3)
                 {
@@ -61,31 +91,7 @@ namespace Demo_SPR
                 lineCount++;
             }
 
-            using (var connection = new System.Data.SqlClient.SqlConnection("Data Source=(local);Initial Catalog=TradeDatabase;Integrated Security=True;"))
-            {
-                connection.Open();
-                using (var transaction = connection.BeginTransaction())
-                {
-                    foreach (var trade in trades)
-                    {
-                        var command = connection.CreateCommand();
-                        command.Transaction = transaction;
-                        command.CommandType = System.Data.CommandType.StoredProcedure;
-                        command.CommandText = "dbo.insert_trade";
-                        command.Parameters.AddWithValue("@sourceCurrency", trade.SourceCurrency);
-                        command.Parameters.AddWithValue("@destinationCurrency", trade.DestinationCurrency);
-                        command.Parameters.AddWithValue("@lots", trade.Lots);
-                        command.Parameters.AddWithValue("@price", trade.Price);
-
-                        command.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
-                }
-                connection.Close();
-            }
-
-            Console.WriteLine("INFO: {0} trades processed", trades.Count);
+            return trades;
         }
 
         private List<string> ReadTradeData(Stream stream)
