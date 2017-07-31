@@ -26,6 +26,8 @@ namespace Demo_SPR
             return trades;
         }
 
+        //TODO
+        // this method can be extracted to other interface
         private TradeRecord ConverTradDataToTradeRecord(string[] fields)
         {
             var sourceCurrencyCode = fields[0].Substring(0, 3);
@@ -42,6 +44,8 @@ namespace Demo_SPR
             };
         }
 
+        //TODO
+        // this method can be extracted to other interface
         private bool ValidateTradeData(string[] fields, int lineCount)
         {
             if (fields.Length != 3)
