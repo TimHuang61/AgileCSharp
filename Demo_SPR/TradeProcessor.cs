@@ -9,11 +9,12 @@ namespace Demo_SPR
     public class TradeProcessor
     {
         private static float LotSize = 100000f;
+        private readonly StreamTradeDataProvider streamTradeDataProvider = new StreamTradeDataProvider();
 
         public void ProcessTrades(Stream stream)
         {
             // read rows
-            var tradeData = ReadTradeData(stream);
+            var tradeData = streamTradeDataProvider.GetTradeData(stream);
             var trades = ParseTrades(tradeData);
             StoreTrades(trades);
         }
@@ -116,21 +117,6 @@ namespace Demo_SPR
             }
 
             return true;
-        }
-
-        private List<string> ReadTradeData(Stream stream)
-        {
-            var lines = new List<string>();
-            using (var reader = new StreamReader(stream))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    lines.Add(line);
-                }
-            }
-
-            return lines;
         }
     }
 }
