@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 
 namespace Demo_SPR
@@ -13,8 +15,12 @@ namespace Demo_SPR
             // read rows
             var tradeData = ReadTradeData(stream);
             var trades = ParseTrades(tradeData);
+            StoreTrades(trades);
+        }
 
-            using (var connection = new System.Data.SqlClient.SqlConnection("Data Source=(local);Initial Catalog=TradeDatabase;Integrated Security=True;"))
+        private static void ParseTrades(List<TradeRecord> trades)
+        {
+            using (var connection = new SqlConnection("Data Source=(local);Initial Catalog=TradeDatabase;Integrated Security=True;"))
             {
                 connection.Open();
                 using (var transaction = connection.BeginTransaction())
@@ -23,7 +29,7 @@ namespace Demo_SPR
                     {
                         var command = connection.CreateCommand();
                         command.Transaction = transaction;
-                        command.CommandType = System.Data.CommandType.StoredProcedure;
+                        command.CommandType = CommandType.StoredProcedure;
                         command.CommandText = "dbo.insert_trade";
                         command.Parameters.AddWithValue("@sourceCurrency", trade.SourceCurrency);
                         command.Parameters.AddWithValue("@destinationCurrency", trade.DestinationCurrency);
@@ -35,6 +41,7 @@ namespace Demo_SPR
 
                     transaction.Commit();
                 }
+
                 connection.Close();
             }
 
