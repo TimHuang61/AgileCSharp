@@ -11,20 +11,12 @@ namespace Demo_SPR
         public void ProcessTrades(Stream stream)
         {
             // read rows
-            var lines = new List<string>();
-            using (var reader = new StreamReader(stream))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    lines.Add(line);
-                }
-            }
+            var tradeData = ReadTradeData(stream);
 
             var trades = new List<TradeRecord>();
 
             var lineCount = 1;
-            foreach (var line in lines)
+            foreach (var line in tradeData)
             {
                 var fields = line.Split(new char[] { ',' });
 
@@ -94,6 +86,21 @@ namespace Demo_SPR
             }
 
             Console.WriteLine("INFO: {0} trades processed", trades.Count);
+        }
+
+        private List<string> ReadTradeData(Stream stream)
+        {
+            var lines = new List<string>();
+            using (var reader = new StreamReader(stream))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    lines.Add(line);
+                }
+            }
+
+            return lines;
         }
     }
 }
