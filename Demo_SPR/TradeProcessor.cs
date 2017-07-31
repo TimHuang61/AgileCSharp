@@ -44,7 +44,6 @@ namespace Demo_SPR
         private List<TradeRecord> ParseTrades(List<string> tradeData)
         {
             var trades = new List<TradeRecord>();
-
             var lineCount = 1;
             foreach (var line in tradeData)
             {
@@ -54,26 +53,27 @@ namespace Demo_SPR
                     continue;
                 }
 
-                var sourceCurrencyCode = fields[0].Substring(0, 3);
-                var destinationCurrencyCode = fields[0].Substring(3, 3);
-                var tradeAmount = int.Parse(fields[1]);
-                var tradePrice = decimal.Parse(fields[2]);
-
-                // calculate values
-                var trade = new TradeRecord
-                {
-                    SourceCurrency = sourceCurrencyCode,
-                    DestinationCurrency = destinationCurrencyCode,
-                    Lots = tradeAmount / LotSize,
-                    Price = tradePrice
-                };
-
-                trades.Add(trade);
-
+                trades.Add(ConverTradDataToTradeRecord(fields));
                 lineCount++;
             }
 
             return trades;
+        }
+
+        private TradeRecord ConverTradDataToTradeRecord(string[] fields)
+        {
+            var sourceCurrencyCode = fields[0].Substring(0, 3);
+            var destinationCurrencyCode = fields[0].Substring(3, 3);
+            var tradeAmount = int.Parse(fields[1]);
+            var tradePrice = decimal.Parse(fields[2]);
+
+            return new TradeRecord
+            {
+                SourceCurrency = sourceCurrencyCode,
+                DestinationCurrency = destinationCurrencyCode,
+                Lots = tradeAmount / LotSize,
+                Price = tradePrice
+            };
         }
 
         private bool ValidateTradeData(string[] fields, int lineCount)
