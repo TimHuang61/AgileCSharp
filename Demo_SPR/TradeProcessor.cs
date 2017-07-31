@@ -5,16 +5,24 @@ namespace Demo_SPR
 {
     public class TradeProcessor
     {
-        private readonly StreamTradeDataProvider streamTradeDataProvider = new StreamTradeDataProvider();
-        private readonly SimpleTradeParser simpleTradeParser = new SimpleTradeParser();
-        private readonly AdoNetTradeStorage adoNetTradeStorage = new AdoNetTradeStorage();
+        // refactor: use Dependency Injection to this constructor
+        private readonly ITradeDataProvider tradeDataProvider;
+        private readonly ITradeParser tradeParser;
+        private readonly ITradeStorage tradeStorage;
+
+        public TradeProcessor(ITradeDataProvider tradeDataProvider, ITradeParser tradeParser, ITradeStorage tradeStorage)
+        {
+            this.tradeDataProvider = tradeDataProvider;
+            this.tradeParser = tradeParser;
+            this.tradeStorage = tradeStorage;
+        }
 
         public void ProcessTrades(Stream stream)
         {
             // read rows
-            var tradeData = streamTradeDataProvider.GetTradeData(stream);
-            var trades = simpleTradeParser.Parse(tradeData);
-            adoNetTradeStorage.Persist(trades);
+            var tradeData = tradeDataProvider.GetTradeData(stream);
+            var trades = tradeParser.Parse(tradeData);
+            tradeStorage.Persist(trades);
         }
     }
 }
