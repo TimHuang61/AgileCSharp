@@ -40,8 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdoNetTradeStorage.cs" />
     <Compile Include="ITradeDataProvider.cs" />
     <Compile Include="ITradeParser.cs" />
+    <Compile Include="ITradeStorage.cs" />
     <Compile Include="SimpleTradeParser.cs" />
     <Compile Include="StreamTradeDataProvider.cs" />
     <Compile Include="TradeProcessor.cs" />
